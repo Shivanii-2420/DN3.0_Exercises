@@ -1,0 +1,786 @@
+Exercise 1: Inventory Management System
+
+1.//Understand the Problem
+Importance of Data Structures and Algorithms:
+Efficient data storage and retrieval are crucial for managing large inventories. Choosing the right data structure ensures that operations such as adding, updating, and deleting products are performed quickly and efficiently. Data structures like ArrayList and HashMap offer different performance characteristics, impacting the system's overall efficiency.
+
+Suitable Data Structures:
+ArrayList: Maintains an ordered collection of items. Suitable for scenarios where the order of items is important, but it is less efficient for frequent search operations.
+HashMap: Provides a key-value mapping, enabling average-case constant time complexity (O(1)) for add, update, and delete operations. Ideal for quick lookups by product ID.
+TreeMap: Maintains a sorted order of keys. Useful if products need to be accessed in a sorted manner based on their IDs.
+
+2.//Implementation
+Class Definitions and Data Structures:
+
+import java.util.HashMap;
+import java.util.Map;
+
+// Define the Product class
+class Product {
+    private int productId;
+    private String productName;
+    private int quantity;
+    private double price;
+
+    public Product(int productId, String productName, int quantity, double price) {
+        this.productId = productId;
+        this.productName = productName;
+        this.quantity = quantity;
+        this.price = price;
+    }
+
+    // Getters and setters
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", productName='" + productName + '\'' +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                '}';
+    }
+}
+
+// Define the Inventory class
+class Inventory {
+    private Map<Integer, Product> productMap = new HashMap<>();
+
+    // Add a product
+    public void addProduct(Product product) {
+        productMap.put(product.getProductId(), product);
+    }
+
+    // Update a product
+    public void updateProduct(Product product) {
+        if (productMap.containsKey(product.getProductId())) {
+            productMap.put(product.getProductId(), product);
+        } else {
+            System.out.println("Product not found.");
+        }
+    }
+
+    // Delete a product
+    public void deleteProduct(int productId) {
+        if (productMap.containsKey(productId)) {
+            productMap.remove(productId);
+        } else {
+            System.out.println("Product not found.");
+        }
+    }
+
+    // Retrieve a product
+    public Product getProduct(int productId) {
+        return productMap.get(productId);
+    }
+
+    // Display all products
+    public void displayProducts() {
+        for (Product product : productMap.values()) {
+            System.out.println(product);
+        }
+    }
+}
+3.//Analysis
+Time Complexity:
+ArrayList:
+Add: O(1) if added at the end, but O(n) if added elsewhere.
+Update: O(n) due to the need to iterate to find the item.
+Delete: O(n) to find and remove the item.
+
+
+HashMap:
+Add: O(1) average case.
+Update: O(1) average case if the key is known.
+Delete: O(1) average case if the key is known.
+
+Optimization: HashMap is optimal due to its average-case constant time complexity for operations. For concurrent access, consider using ConcurrentHashMap. Implementing caching or lazy-loading strategies can further enhance performance for large-scale systems.
+
+Exercise 2: E-commerce Platform Search Function
+
+1.// Understand Asymptotic Notation
+Big O Notation:
+Big O notation describes the upper bound of an algorithm's time complexity, giving an idea of the worst-case scenario for the algorithm's performance. It helps in analyzing and comparing the efficiency of different algorithms based on how their runtime scales with the input size.
+Best, Average, and Worst-Case Scenarios:
+
+Linear Search:
+Best Case: O(1) - When the target element is the first element in the array.
+Average Case: O(n) - When the target element is somewhere in the middle of the array.
+Worst Case: O(n) - When the target element is not present or is the last element in the array.
+
+Binary Search:
+Best Case: O(1) - When the target element is at the middle of the array.
+Average Case: O(log n) - When the array size is halved in each step.
+Worst Case: O(log n) - When the array is halved repeatedly until the target is found or the search space is exhausted.
+
+2.//Setup
+Product Class:
+// Define the Product class with search attributes
+public class Product {
+    private int productId;
+    private String productName;
+    private String category;
+
+    public Product(int productId, String productName, String category) {
+        this.productId = productId;
+        this.productName = productName;
+        this.category = category;
+    }
+
+    // Getters and setters
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", productName='" + productName + '\'' +
+                ", category='" + category + '\'' +
+                '}';
+    }
+}
+
+3.//Implementation
+Linear Search:
+public class LinearSearch {
+    public static Product search(Product[] products, int targetId) {
+        for (Product product : products) {
+            if (product.getProductId() == targetId) {
+                return product;
+            }
+        }
+        return null;
+    }
+}
+
+Binary Search:
+import java.util.Arrays;
+public class BinarySearch {
+    public static Product search(Product[] products, int targetId) {
+        int left = 0;
+        int right = products.length - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (products[mid].getProductId() == targetId) {
+                return products[mid];
+            } else if (products[mid].getProductId() < targetId) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return null;
+    }
+}
+Sorting the Array for Binary Search:
+// Sorting products by productId for binary search
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class ProductSorter {
+    public static void sortProducts(Product[] products) {
+        Arrays.sort(products, Comparator.comparingInt(Product::getProductId));
+    }
+}
+
+4.//Analysis
+Time Complexity Comparison:
+Linear Search:
+Time Complexity: O(n) for all cases.
+Suitable for small datasets or unsorted data.
+
+Binary Search:
+Time Complexity: O(log n) for all cases, provided the array is sorted.
+Suitable for large datasets where the data is sorted or can be sorted efficiently.
+
+Suitability:
+Binary Search is more suitable for the e-commerce platform if the product dataset is large and can be kept sorted. It provides faster search performance compared to linear search. However, if the dataset is small or unsorted, linear search might be simpler to implement and use without the need for sorting.
+
+Exercise 3: Sorting Customer Orders
+
+1.//Understand Sorting Algorithms
+Bubble Sort:
+Description: Repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order. This process continues until no swaps are needed.
+Time Complexity: O(n^2) for average and worst cases, where n is the number of elements.
+
+Insertion Sort:
+Description: Builds the final sorted array one item at a time by repeatedly picking the next item and inserting it into its correct position among the previously sorted items.
+Time Complexity: O(n^2) for average and worst cases, O(n) for best case (when the array is already sorted).
+
+Quick Sort:
+Description: Divides the array into smaller sub-arrays based on a pivot element. Elements less than the pivot go to the left, and elements greater go to the right. Recursively applies the same strategy to the sub-arrays.
+Time Complexity: O(n log n) on average, O(n^2) in the worst case (if the pivot selection is poor).
+
+Merge Sort:
+Description: Divides the array into halves, recursively sorts each half, and then merges the sorted halves to produce a sorted array.
+Time Complexity: O(n log n) for both average and worst cases.
+
+// Define the Order class with relevant attributes
+public class Order {
+    private int orderId;
+    private String customerName;
+    private double totalPrice;
+
+    public Order(int orderId, String customerName, double totalPrice) {
+        this.orderId = orderId;
+        this.customerName = customerName;
+        this.totalPrice = totalPrice;
+    }
+
+    // Getters and setters
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderId=" + orderId +
+                ", customerName='" + customerName + '\'' +
+                ", totalPrice=" + totalPrice +
+                '}';
+    }
+}
+3.//Implementation
+Bubble Sort Implementation:
+public class BubbleSort {
+    public static void sortOrders(Order[] orders) {
+        int n = orders.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (orders[j].getTotalPrice() > orders[j + 1].getTotalPrice()) {
+                    // Swap orders[j] and orders[j + 1]
+                    Order temp = orders[j];
+                    orders[j] = orders[j + 1];
+                    orders[j + 1] = temp;
+                }
+            }
+        }
+    }
+}
+
+Quick Sort Implementation:
+public class QuickSort {
+    public static void sortOrders(Order[] orders, int low, int high) {
+        if (low < high) {
+            int pi = partition(orders, low, high);
+            sortOrders(orders, low, pi - 1);
+            sortOrders(orders, pi + 1, high);
+        }
+    }
+
+    private static int partition(Order[] orders, int low, int high) {
+        double pivot = orders[high].getTotalPrice();
+        int i = (low - 1);
+        for (int j = low; j < high; j++) {
+            if (orders[j].getTotalPrice() < pivot) {
+                i++;
+                Order temp = orders[i];
+                orders[i] = orders[j];
+                orders[j] = temp;
+            }
+        }
+        Order temp = orders[i + 1];
+        orders[i + 1] = orders[high];
+        orders[high] = temp;
+        return i + 1;
+    }
+}
+4.//Analysis
+Performance Comparison:
+Bubble Sort:
+Time Complexity: O(n^2) for both average and worst cases.
+Suitability: Simple to implement but inefficient for large datasets due to quadratic time complexity.
+
+Quick Sort:
+Time Complexity: O(n log n) on average, O(n^2) in the worst case.
+Suitability: Generally preferred over Bubble Sort for larger datasets due to its more efficient average-case time complexity. However, it requires careful pivot selection to avoid the worst-case scenario.
+Efficiency: Quick Sort is more efficient for large datasets due to its O(n log n) average-case time complexity.
+Performance: Bubble Sort’s O(n^2) time complexity makes it unsuitable for larger datasets or performance-critical applications.
+
+Exercise 4: Employee Management System
+
+1.//Understand Array Representation
+Array Representation in Memory:
+Description: Arrays are contiguous blocks of memory where each element is of the same type and occupies the same amount of space. Elements are indexed, making access to any element via its index constant time, O(1).
+Advantages:
+Fast access to elements by index.
+Simple and efficient in terms of memory and performance for fixed-size collections.
+
+2.//Setup
+// Define the Employee class with relevant attributes
+public class Employee {
+    private int employeeId;
+    private String name;
+    private String position;
+    private double salary;
+
+    public Employee(int employeeId, String name, String position, double salary) {
+        this.employeeId = employeeId;
+        this.name = name;
+        this.position = position;
+        this.salary = salary;
+    }
+
+    // Getters and setters
+    public int getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "employeeId=" + employeeId +
+                ", name='" + name + '\'' +
+                ", position='" + position + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
+}
+3.// Implementation
+Array Operations:
+public class EmployeeManagement {
+    private Employee[] employees;
+    private int size;
+    
+    public EmployeeManagement(int capacity) {
+        employees = new Employee[capacity];
+        size = 0;
+    }
+
+    // Add an employee
+    public void addEmployee(Employee employee) {
+        if (size < employees.length) {
+            employees[size++] = employee;
+        } else {
+            System.out.println("Array is full. Cannot add more employees.");
+        }
+    }
+
+    // Search for an employee by ID
+    public Employee searchEmployeeById(int employeeId) {
+        for (int i = 0; i < size; i++) {
+            if (employees[i].getEmployeeId() == employeeId) {
+                return employees[i];
+            }
+        }
+        return null;
+    }
+
+    // Traverse the array
+    public void traverseEmployees() {
+        for (int i = 0; i < size; i++) {
+            System.out.println(employees[i]);
+        }
+    }
+
+    // Delete an employee by ID
+    public void deleteEmployeeById(int employeeId) {
+        for (int i = 0; i < size; i++) {
+            if (employees[i].getEmployeeId() == employeeId) {
+                // Shift elements to the left
+                for (int j = i; j < size - 1; j++) {
+                    employees[j] = employees[j + 1];
+                }
+                employees[size - 1] = null;
+                size--;
+                return;
+            }
+        }
+        System.out.println("Employee not found.");
+    }
+}
+4.//Analysis
+Time Complexity Analysis:
+Add: O(1) if space is available.
+Search: O(n) for linear search through the array.
+Traverse: O(n) as every element needs to be visited.
+Delete: O(n) due to the need to shift elements after deletion.
+
+Limitations of Arrays:
+Fixed Size: Arrays have a fixed size, which can lead to wasted space if the number of elements is less than the array capacity or require resizing if more space is needed.
+Insertion and Deletion: Inefficient compared to dynamic data structures like linked lists due to the need to shift elements.
+
+When to Use Arrays:
+When the size of the dataset is known and relatively static.
+When fast access to elements by index is required.
+When memory usage needs to be predictable and efficient.
+
+Exercise 5: Task Management System
+
+1.//Understand Linked Lists
+Singly Linked List:
+Description: A singly linked list consists of nodes where each node contains a data element and a reference (or link) to the next node in the sequence. It allows traversal in only one direction (from the head to the tail).
+Advantages: Simple implementation and efficient insertions and deletions from the front of the 
+list.
+
+Doubly Linked List:
+Description: A doubly linked list extends the singly linked list by adding a reference to the previous node as well as the next node. This allows traversal in both directions (from head to tail and vice versa).
+Advantages: More flexible for bidirectional traversal and easier deletion of nodes if the reference to the previous node is available.
+
+2.//Setup
+public class Task {
+    private int taskId;
+    private String taskName;
+    private String status;
+
+    public Task(int taskId, String taskName, String status) {
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.status = status;
+    }
+
+    // Getters and setters
+    public int getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "taskId=" + taskId +
+                ", taskName='" + taskName + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+}
+3.//Implementation
+Singly Linked List Implementation:
+public class SinglyLinkedList {
+    private Node head;
+    
+    private class Node {
+        Task task;
+        Node next;
+
+        Node(Task task) {
+            this.task = task;
+            this.next = null;
+        }
+    }
+
+    // Add a task to the list
+    public void addTask(Task task) {
+        Node newNode = new Node(task);
+        if (head == null) {
+            head = newNode;
+        } else {
+            Node current = head;
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+    }
+
+    // Search for a task by ID
+    public Task searchTaskById(int taskId) {
+        Node current = head;
+        while (current != null) {
+            if (current.task.getTaskId() == taskId) {
+                return current.task;
+            }
+            current = current.next;
+        }
+        return null;
+    }
+
+    // Traverse the list and print tasks
+    public void traverseTasks() {
+        Node current = head;
+        while (current != null) {
+            System.out.println(current.task);
+            current = current.next;
+        }
+    }
+
+    // Delete a task by ID
+    public void deleteTaskById(int taskId) {
+        if (head == null) {
+            return;
+        }
+        if (head.task.getTaskId() == taskId) {
+            head = head.next;
+            return;
+        }
+        Node current = head;
+        while (current.next != null && current.next.task.getTaskId() != taskId) {
+            current = current.next;
+        }
+        if (current.next != null) {
+            current.next = current.next.next;
+        }
+    }
+}
+4.//Analysis
+Time Complexity Analysis:
+Add: O(n) in the worst case when adding at the end of the list.
+Search: O(n) for a linear search through the list.
+Traverse: O(n) since all nodes need to be visited.
+Delete: O(n) in the worst case if the task to be deleted is at the end or not found.
+
+Advantages of Linked Lists over Arrays:
+Dynamic Size: Linked lists can grow and shrink dynamically as needed, unlike arrays that have a fixed size.
+Efficient Insertions/Deletions: More efficient insertions and deletions, especially when not working with a sorted list.
+
+
+Exercise 6: Library Management System
+1. Understand Search Algorithms
+Linear Search:
+Description: Sequentially checks each element until the desired element is found or the end of the list is reached.
+Time Complexity: O(n), where n is the number of elements in the list.
+
+Binary Search:
+Description: Efficiently finds an element in a sorted list by repeatedly dividing the search interval in half.
+Time Complexity: O(log n), where n is the number of elements. Requires the list to be sorted beforehand.
+
+2. Setup
+Book Class:
+public class Book {
+    private int bookId;
+    private String title;
+    private String author;
+
+    public Book(int bookId, String title, String author) {
+        this.bookId = bookId;
+        this.title = title;
+        this.author = author;
+    }
+
+    // Getters and setters
+    public int getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "bookId=" + bookId +
+                ", title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                '}';
+    }
+}
+3. Implementation
+Linear Search Implementation:
+public class LinearSearch {
+    public static Book searchByTitle(Book[] books, String title) {
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                return book;
+            }
+        }
+        return null;
+    }
+}
+Binary Search Implementation:
+import java.util.Arrays;
+
+public class BinarySearch {
+    public static Book searchByTitle(Book[] books, String title) {
+        int low = 0;
+        int high = books.length - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            int comparison = books[mid].getTitle().compareToIgnoreCase(title);
+            if (comparison == 0) {
+                return books[mid];
+            } else if (comparison < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return null;
+    }
+}
+4. Analysis
+Time Complexity Comparison:
+Linear Search: O(n), which is suitable for unsorted lists or smaller datasets.
+Binary Search: O(log n), but requires the list to be sorted. More efficient for larger datasets if sorted.
+
+When to Use Each Algorithm:
+Linear Search: Use when dealing with unsorted data or small datasets where sorting might not be necessary.
+Binary Search: Use when dealing with large, sorted datasets to take advantage of its logarithmic time complexity.
+
+
+Exercise 7: Financial Forecasting
+
+1.//Understand Recursive Algorithms
+Recursion:
+Description: A technique where a method calls itself to solve smaller instances of the same problem. It simplifies problems that can be broken down into similar subproblems.
+Advantages: Often leads to simpler and more readable code, especially for problems that naturally fit a recursive structure (e.g., tree traversals, factorial calculation).
+
+2.// Setup
+Recursive Method:
+public class FinancialForecasting {
+    // Example recursive method to calculate future value with simple interest
+    public static double calculateFutureValue(double principal, double rate, int years) {
+        if (years <= 0) {
+            return principal;
+        }
+        return calculateFutureValue(principal, rate, years - 1) * (1 + rate);
+    }
+}
+
+3.// Implementation
+Recursive Forecasting:
+public class FinancialForecasting {
+    // Recursive method to forecast future value with growth rate
+    public static double forecastValue(double initialValue, double growthRate, int periods) {
+        if (periods <= 0) {
+            return initialValue;
+        }
+        return forecastValue(initialValue * (1 + growthRate), growthRate, periods - 1);
+    }
+}
+
+4. //Analysis
+Time Complexity Analysis:
+Recursive Method: O(n) where n is the number of periods. Each call processes one period, leading to a linear time complexity.
+
+Optimization:
+Memoization: Store results of expensive function calls to avoid redundant calculations.
+Iterative Approach: Convert recursive algorithms to iterative ones to reduce overhead from recursive calls and improve performance, especially for large input sizes.

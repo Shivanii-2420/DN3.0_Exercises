@@ -1,0 +1,364 @@
+// BookstoreAPI Application - Main Application Class
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class BookstoreApiApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BookstoreApiApplication.class, args);
+    }
+}
+
+// Exercise 2: Creating Basic REST Controllers
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    private List<Book> books = new ArrayList<>();
+
+    // GET request to retrieve all books
+    @GetMapping
+    public List<Book> getAllBooks() {
+        return books;
+    }
+
+    // POST request to add a new book
+    @PostMapping
+    public Book addBook(@RequestBody Book book) {
+        books.add(book);
+        return book;
+    }
+
+    // PUT request to update an existing book
+    @PutMapping("/{id}")
+    public Book updateBook(@PathVariable int id, @RequestBody Book book) {
+        books.set(id, book);
+        return book;
+    }
+
+    // DELETE request to remove a book
+    @DeleteMapping("/{id}")
+    public void deleteBook(@PathVariable int id) {
+        books.remove(id);
+    }
+}
+
+// Book Entity
+class Book {
+    private int id;
+    private String title;
+    private String author;
+    private double price;
+    private String isbn;
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getAuthor() {
+        return author;
+    }
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+    public double getPrice() {
+        return price;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+    }
+    public String getIsbn() {
+        return isbn;
+    }
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+}
+
+// Exercise 3: Handling Path Variables and Query Parameters
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    // Existing methods...
+
+    // GET request to retrieve a book by ID using path variable
+    @GetMapping("/{id}")
+    public Book getBookById(@PathVariable int id) {
+        return books.get(id);
+    }
+
+    // GET request to filter books by title and author using query parameters
+    @GetMapping("/search")
+    public List<Book> searchBooks(@RequestParam String title, @RequestParam String author) {
+        // Example logic to filter books
+        return books.stream()
+                .filter(book -> book.getTitle().equalsIgnoreCase(title) && book.getAuthor().equalsIgnoreCase(author))
+                .toList();
+    }
+}
+
+// Exercise 4: Processing Request Body and Form Data
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/customers")
+public class CustomerController {
+
+    private List<Customer> customers = new ArrayList<>();
+
+    // POST request to create a new customer using JSON request body
+    @PostMapping
+    public Customer createCustomer(@RequestBody Customer customer) {
+        customers.add(customer);
+        return customer;
+    }
+
+    // POST request to register a customer using form data
+    @PostMapping("/register")
+    public Customer registerCustomer(@RequestParam String name, @RequestParam String email) {
+        Customer customer = new Customer(name, email);
+        customers.add(customer);
+        return customer;
+    }
+}
+
+// Customer Entity
+class Customer {
+    private String name;
+    private String email;
+
+    public Customer(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    // Getters and Setters...
+}
+
+// Exercise 5: Customizing Response Status and Headers
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    // Existing methods...
+
+    // POST request to add a book with custom response status
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Book addBook(@RequestBody Book book) {
+        books.add(book);
+        return book;
+    }
+
+    // DELETE request to remove a book with custom response headers
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBookWithHeader(@PathVariable int id) {
+        books.remove(id);
+        return ResponseEntity.noContent().header("Custom-Header", "Book Deleted").build();
+    }
+}
+
+// Exercise 6: Exception Handling in REST Controllers
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(IndexOutOfBoundsException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleIndexOutOfBoundsException() {
+        return "Book not found";
+    }
+
+    // Other exception handlers...
+}
+
+// Exercise 8: Implementing CRUD Operations
+
+// The CRUD operations have already been covered in the previous examples within the BookController and CustomerController.
+
+
+// Exercise 9: Understanding HATEOAS
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    // Existing methods...
+
+    // GET request to retrieve a book with HATEOAS links
+    @GetMapping("/{id}")
+    public EntityModel<Book> getBookWithHATEOAS(@PathVariable int id) {
+        Book book = books.get(id);
+        EntityModel<Book> resource = EntityModel.of(book);
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(BookController.class).getBookWithHATEOAS(id)).withSelfRel();
+        resource.add(selfLink);
+        return resource;
+    }
+}
+
+// Exercise 10: Configuring Content Negotiation
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer
+            .favorParameter(true)
+            .parameterName("mediaType")
+            .defaultContentType(MediaType.APPLICATION_JSON)
+            .mediaType("json", MediaType.APPLICATION_JSON)
+            .mediaType("xml", MediaType.APPLICATION_XML);
+    }
+}
+
+// Exercise 11: Integrating Spring Boot Actuator
+
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.stereotype.Component;
+
+@Configuration
+public class ActuatorConfig {
+
+    @Bean
+    @ConditionalOnAvailableEndpoint
+    public CustomEndpoint customEndpoint() {
+        return new CustomEndpoint();
+    }
+}
+
+@Endpoint(id = "customEndpoint")
+@Component
+public class CustomEndpoint {
+
+    @ReadOperation
+    public String custom() {
+        return "Custom Actuator Endpoint";
+    }
+}
+
+// Exercise 12: Securing RESTful Endpoints with Spring Security
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()
+            .authorizeHttpRequests((requests) -> requests
+                .antMatchers("/books/**").authenticated()
+                .anyRequest().permitAll()
+            )
+            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+        return http.build();
+    }
+}
+
+// Exercise 13: Unit Testing REST Controllers
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+public class BookControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    public void shouldReturnAllBooks() throws Exception {
+        mockMvc.perform(get("/books"))
+            .andExpect(status().isOk());
+    }
+
+    // Other test cases...
+}
+
+// Exercise 14: Integration Testing for REST Services
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.Test;
+
+@SpringBootTest
+@Sql(scripts = "/test-data.sql")
+public class BookIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    public void shouldReturnBookById() throws Exception {
+        mockMvc.perform(get("/books/1"))
+            .andExpect(status().isOk());
+    }
+
+    // Other integration tests...
+}
+
+// Exercise 15: API Documentation with Swagger
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@OpenAPIDefinition(info = @Info(title = "Bookstore API", version = "1.0", description = "Documentation of Bookstore API v1.0"))
+public class SwaggerConfig {
+}
